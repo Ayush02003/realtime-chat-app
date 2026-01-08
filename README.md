@@ -48,6 +48,3 @@ The server maintains an in-memory mapping between user IDs and active socket con
 - Socket.IO
 - JWT-based authentication
 
----
-
-## ⚙️ Getting Started
