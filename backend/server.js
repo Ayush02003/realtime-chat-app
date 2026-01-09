@@ -11,7 +11,7 @@ import cookieParser from "cookie-parser";
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 5000;
-
+const onlineUsers = new Map();
 app.use(express.json());
 app.use(cookieParser());
 
@@ -38,10 +38,21 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  // console.log("User connected:", socket.id);
+  console.log("User connected:", socket.id);
 
   socket.on("disconnect", () => {
+    for (let [userId, sockId] of onlineUsers.entries()) {
+      if (sockId === socket.id) {
+        onlineUsers.delete(userId);
+        break;
+      }
+    }
+    io.emit("online-users", Array.from(onlineUsers.keys()));
     console.log("User disconnected:", socket.id);
+  });
+  socket.on("user-online", (userId) => {
+    onlineUsers.set(userId, socket.id);
+    io.emit("online-users", Array.from(onlineUsers.keys()));
   });
 });
 export { io };
